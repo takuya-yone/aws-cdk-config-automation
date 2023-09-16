@@ -90,14 +90,14 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
           },
           // maximumAutomaticAttempts: 10,
           parameters: {
-            automationAssumeRole: {
-              staticValue: {
-                values: [ssmAutomationRole.roleArn],
+            AutomationAssumeRole: {
+              StaticValue: {
+                Values: [ssmAutomationRole.roleArn],
               },
             },
-            securityGroupId: {
-              resourceValue: {
-                value: 'RESOURCE_ID',
+            SecurityGroupId: {
+              ResourceValue: {
+                Value: 'RESOURCE_ID',
               },
             },
           },
