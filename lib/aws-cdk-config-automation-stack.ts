@@ -10,7 +10,7 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const { accountId } = new ScopedAws(this);
+    // const { accountId } = new ScopedAws(this);
 
     const s3AccessPolicy = new iam.PolicyDocument({
       statements: [
@@ -35,9 +35,9 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
       },
     });
 
-    const securityGroupConfigRule = new config.ManagedRule(
+    const sgRestrictedIncomingConfigRule = new config.ManagedRule(
       this,
-      'SecurityGroupRestrictedIncoming',
+      'SgRestrictedIncomingConfigRule',
       {
         identifier:
           config.ManagedRuleIdentifiers
@@ -55,29 +55,56 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
         // config.MaximumExecutionFrequency.TWELVE_HOURS,
       },
     );
-    const ssmAutomationProperty: ssmincidents.CfnResponsePlan.SsmAutomationProperty =
-      {
-        documentName: 'documentName',
-        roleArn: ssmAutomationRole.roleArn,
 
-        // the properties below are optional
-        documentVersion: 'documentVersion',
-        dynamicParameters: [
-          {
-            key: 'key',
-            value: {
-              variable: 'variable',
+    // const parameters: any = {
+    //   AutomationAssumeRole: {
+    //     staticValue: {
+    //       values: [ssmAutomationRole.roleArn],
+    //     },
+    //   },
+    //   SecurityGroupId: {
+    //     resourceValue: {
+    //       value: 'RESOURCE_ID',
+    //     },
+    //   },
+    // };
+
+    // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_config.CfnRemediationConfiguration.html
+    const sgRestrictedIncomingConfigRuleRemediation =
+      new config.CfnRemediationConfiguration(
+        this,
+        'SgRestrictedIncomingConfigRuleRemediation',
+        {
+          configRuleName: sgRestrictedIncomingConfigRule.configRuleName,
+          targetId: 'AWS-CloseSecurityGroup',
+          targetType: 'SSM_DOCUMENT',
+          // targetVersion: '1',
+
+          // the properties below are optional
+          automatic: false,
+          executionControls: {
+            ssmControls: {
+              concurrentExecutionRatePercentage: 2,
+              errorPercentage: 5,
             },
           },
-        ],
-        parameters: [
-          {
-            key: 'key',
-            values: ['values'],
+          // maximumAutomaticAttempts: 10,
+          parameters: {
+            automationAssumeRole: {
+              staticValue: {
+                values: [ssmAutomationRole.roleArn],
+              },
+            },
+            securityGroupId: {
+              resourceValue: {
+                value: 'RESOURCE_ID',
+              },
+            },
           },
-        ],
-        targetAccount: 'targetAccount',
-      };
+          // resourceType: 'resourceType',
+          // retryAttemptSeconds: 123,
+        },
+      );
   }
   // const securityGroupConfigRuleAutomation = new ssm.
 }
