@@ -1,10 +1,10 @@
-import * as cdk from "aws-cdk-lib";
-import { Construct } from "constructs";
-import { ScopedAws } from "aws-cdk-lib";
-import { aws_config as config } from "aws-cdk-lib";
-import { aws_ssm as ssm } from "aws-cdk-lib";
-import { aws_iam as iam } from "aws-cdk-lib";
-import { aws_ssmincidents as ssmincidents } from "aws-cdk-lib";
+import * as cdk from 'aws-cdk-lib';
+import { Construct } from 'constructs';
+import { ScopedAws } from 'aws-cdk-lib';
+import { aws_config as config } from 'aws-cdk-lib';
+import { aws_ssm as ssm } from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_ssmincidents as ssmincidents } from 'aws-cdk-lib';
 
 export class AwsCdkConfigAutomationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -15,18 +15,18 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
     const s3AccessPolicy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
-          actions: ["s3:*"],
-          resources: ["*"],
+          actions: ['s3:*'],
+          resources: ['*'],
         }),
       ],
     });
 
-    const ssmAutomationRole = new iam.Role(this, "testSsmAutomationRole", {
-      roleName: "TestSsmAutomationRole",
-      assumedBy: new iam.ServicePrincipal("ssm.amazonaws.com"),
+    const ssmAutomationRole = new iam.Role(this, 'testSsmAutomationRole', {
+      roleName: 'TestSsmAutomationRole',
+      assumedBy: new iam.ServicePrincipal('ssm.amazonaws.com'),
       managedPolicies: [
         iam.ManagedPolicy.fromAwsManagedPolicyName(
-          "service-role/AmazonSSMAutomationRole"
+          'service-role/AmazonSSMAutomationRole',
         ),
         // iam.ManagedPolicy.fromAwsManagedPolicyName("AWSXrayWriteOnlyAccess"),
       ],
@@ -37,7 +37,7 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
 
     const securityGroupConfigRule = new config.ManagedRule(
       this,
-      "SecurityGroupRestrictedIncoming",
+      'SecurityGroupRestrictedIncoming',
       {
         identifier:
           config.ManagedRuleIdentifiers
@@ -53,30 +53,30 @@ export class AwsCdkConfigAutomationStack extends cdk.Stack {
         // default is 24 hours
         // maximumExecutionFrequency:
         // config.MaximumExecutionFrequency.TWELVE_HOURS,
-      }
+      },
     );
     const ssmAutomationProperty: ssmincidents.CfnResponsePlan.SsmAutomationProperty =
       {
-        documentName: "documentName",
+        documentName: 'documentName',
         roleArn: ssmAutomationRole.roleArn,
 
         // the properties below are optional
-        documentVersion: "documentVersion",
+        documentVersion: 'documentVersion',
         dynamicParameters: [
           {
-            key: "key",
+            key: 'key',
             value: {
-              variable: "variable",
+              variable: 'variable',
             },
           },
         ],
         parameters: [
           {
-            key: "key",
-            values: ["values"],
+            key: 'key',
+            values: ['values'],
           },
         ],
-        targetAccount: "targetAccount",
+        targetAccount: 'targetAccount',
       };
   }
   // const securityGroupConfigRuleAutomation = new ssm.
