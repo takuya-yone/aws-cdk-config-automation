@@ -22,6 +22,7 @@ export class RestrictedRDPConstruct extends Construct {
       this,
       'RestrictedRDPRule',
       {
+        configRuleName: 'RestrictedRDPRule',
         identifier:
           config.ManagedRuleIdentifiers
             .EC2_SECURITY_GROUPS_RESTRICTED_INCOMING_TRAFFIC,

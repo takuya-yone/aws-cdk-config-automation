@@ -22,6 +22,7 @@ export class RestrictedSSHConstruct extends Construct {
       this,
       'RestrictedSSHRule',
       {
+        configRuleName: 'RestrictedSSHRule',
         identifier:
           config.ManagedRuleIdentifiers
             .EC2_SECURITY_GROUPS_RESTRICTED_INCOMING_TRAFFIC,

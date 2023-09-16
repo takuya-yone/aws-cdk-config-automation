@@ -4,45 +4,38 @@ import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
 
-export interface RestrictedCommonPortsConstructProps extends cdk.StackProps {
+export interface RdsSnapshotsPublicProhibitedProps extends cdk.StackProps {
   ssmAutomationRole: iam.Role;
 }
 
-export class RestrictedCommonPortsConstruct extends Construct {
+export class RdsSnapshotsPublicProhibitedConstruct extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    props: RestrictedCommonPortsConstructProps,
+    props: RdsSnapshotsPublicProhibitedProps,
   ) {
     super(scope, id);
 
     const { accountId } = new ScopedAws(this);
 
-    const restrictedCommonPortsRule = new config.ManagedRule(
+    const rdsSnapshotsPublicProhibitedRule = new config.ManagedRule(
       this,
-      'RestrictedCommonPortsRule',
+      'RdsSnapshotsPublicProhibitedRule',
       {
-        configRuleName: 'RestrictedCommonPortsRule',
+        configRuleName: 'RdsSnapshotsPublicProhibitedRule',
         identifier:
-          config.ManagedRuleIdentifiers
-            .EC2_SECURITY_GROUPS_RESTRICTED_INCOMING_TRAFFIC,
-        inputParameters: {
-          blockedPort1: 20,
-          blockedPort2: 21,
-          blockedPort3: 3306,
-          blockedPort4: 4333,
-        },
+          config.ManagedRuleIdentifiers.RDS_SNAPSHOTS_PUBLIC_PROHIBITED,
       },
     );
 
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_config.CfnRemediationConfiguration.html
-    const restrictedCommonPortsRuleRemediation =
+    const rdsSnapshotsPublicProhibitedRuleRemediation =
       new config.CfnRemediationConfiguration(
         this,
-        'RestrictedCommonPortsRuleRemediation',
+        'RdsSnapshotsPublicProhibitedRuleRemediation',
         {
-          configRuleName: restrictedCommonPortsRule.configRuleName,
-          targetId: 'AWS-CloseSecurityGroup',
+          configRuleName: rdsSnapshotsPublicProhibitedRule.configRuleName,
+          targetId: 'AWSSupport-ModifyRDSSnapshotPermission',
           targetType: 'SSM_DOCUMENT',
           // targetVersion: '1',
 
@@ -55,14 +48,31 @@ export class RestrictedCommonPortsConstruct extends Construct {
           },
           // maximumAutomaticAttempts: 10,
           parameters: {
+            SnapshotIdentifiers: {
+              ResourceValue: {
+                Value: 'RESOURCE_ID',
+              },
+            },
+            Private: {
+              StaticValue: {
+                Values: ['Yes'],
+              },
+            },
             AutomationAssumeRole: {
               StaticValue: {
                 Values: [props.ssmAutomationRole.roleArn],
               },
             },
-            SecurityGroupId: {
-              ResourceValue: {
-                Value: 'RESOURCE_ID',
+
+            AccountIds: {
+              StaticValue: {
+                Values: [],
+              },
+            },
+
+            AccountPermissionOperation: {
+              StaticValue: {
+                Values: [],
               },
             },
           },
