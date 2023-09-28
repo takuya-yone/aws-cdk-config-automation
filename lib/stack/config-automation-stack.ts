@@ -1,6 +1,6 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
-import { ScopedAws } from 'aws-cdk-lib';
+import { CfnParameter, ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_ssm as ssm } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
@@ -16,11 +16,52 @@ export class ConfigAutomationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
+    ////////// IAM Role //////////
     const configAutomationIamConstruct = new ConfigAutomationIamConstruct(
       this,
       'ConfigAutomationIamConstruct',
     );
 
+    ////////// Parameters //////////
+    // const isRestrictedSSHConstruct = new CfnParameter(
+    //   this,
+    //   'isRestrictedSSHConstruct',
+    //   {
+    //     default: 'False',
+    //     allowedValues: ['True', 'False'],
+    //   },
+    // );
+    // const isRestrictedRDPConstruct = new CfnParameter(
+    //   this,
+    //   'isRestrictedRDPConstruct',
+    //   {
+    //     default: 'False',
+    //     allowedValues: ['True', 'False'],
+    //   },
+    // );
+
+    // const isRestrictedCommonPortsConstruct = new CfnParameter(
+    //   this,
+    //   'isRestrictedCommonPortsConstruct',
+    //   {
+    //     default: 'False',
+    //     allowedValues: ['True', 'False'],
+    //   },
+    // );
+
+    // const isRdsSnapshotsPublicProhibitedConstruct = new CfnParameter(
+    //   this,
+    //   'isRdsSnapshotsPublicProhibitedConstruct',
+    //   {
+    //     default: 'False',
+    //     allowedValues: ['True', 'False'],
+    //   },
+    // );
+
+    ////////// Rules //////////
+    // console.log(isRestrictedSSHConstruct.valueAsString);
+
+    // if (isRestrictedSSHConstruct.valueAsString === 'True') {
     const restrictedSSHConstruct = new RestrictedSSHConstruct(
       this,
       'RestrictedSSHConstruct',
@@ -28,7 +69,9 @@ export class ConfigAutomationStack extends cdk.Stack {
         ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
       },
     );
+    // }
 
+    // if (isRestrictedRDPConstruct.valueAsString === 'True') {
     const restrictedRDPConstruct = new RestrictedRDPConstruct(
       this,
       'RestrictedRDPConstruct',
@@ -36,7 +79,9 @@ export class ConfigAutomationStack extends cdk.Stack {
         ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
       },
     );
+    // }
 
+    // if (isRestrictedCommonPortsConstruct.valueAsString === 'True') {
     const restrictedCommonPortsConstruct = new RestrictedCommonPortsConstruct(
       this,
       'RestrictedCommonPortsConstruct',
@@ -44,7 +89,9 @@ export class ConfigAutomationStack extends cdk.Stack {
         ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
       },
     );
+    // }
 
+    // if (isRdsSnapshotsPublicProhibitedConstruct.valueAsString === 'True') {
     const rdsSnapshotsPublicProhibitedConstruct =
       new RdsSnapshotsPublicProhibitedConstruct(
         this,
@@ -53,5 +100,6 @@ export class ConfigAutomationStack extends cdk.Stack {
           ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
         },
       );
+    // }
   }
 }
