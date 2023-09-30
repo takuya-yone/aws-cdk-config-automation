@@ -22,6 +22,15 @@ export class ConfigAutomationStack extends cdk.Stack {
       'ConfigAutomationIamConstruct',
     );
 
+    const enableAutomaticRepaier = new CfnParameter(
+      this,
+      'enableAutomaticRepaier',
+      {
+        default: 'false',
+        allowedValues: ['true', 'false'],
+      },
+    );
+
     ////////// Parameters //////////
     // const isRestrictedSSHConstruct = new CfnParameter(
     //   this,
