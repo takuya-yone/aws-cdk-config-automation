@@ -24,7 +24,7 @@ export class ConfigAutomationStack extends cdk.Stack {
 
     const enableAutomaticRepaier = new CfnParameter(
       this,
-      'enableAutomaticRepaier',
+      'EnableAutomaticRepaier',
       {
         default: 'false',
         allowedValues: ['true', 'false'],
