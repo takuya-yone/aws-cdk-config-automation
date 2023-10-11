@@ -1,5 +1,7 @@
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
+import { CfnParameter } from 'aws-cdk-lib';
+
 import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
@@ -17,6 +19,18 @@ export class RestrictedCommonPortsConstruct extends Construct {
     super(scope, id);
 
     const { accountId } = new ScopedAws(this);
+
+    ////////// Parameters //////////
+    const isRestrictedCommonPortsConstructAutoRepaier = new CfnParameter(
+      this,
+      'IsRestrictedCommonPortsConstructAutoRepaier',
+      {
+        default: 'false',
+        allowedValues: ['true', 'false'],
+      },
+    );
+
+    ////////// Rules //////////
 
     const restrictedCommonPortsRule = new config.ManagedRule(
       this,

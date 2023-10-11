@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
+import { CfnParameter } from 'aws-cdk-lib';
 
 export interface RestrictedSSHConstructProps extends cdk.StackProps {
   ssmAutomationRole: iam.Role;
@@ -18,6 +19,17 @@ export class RestrictedSSHConstruct extends Construct {
 
     const { accountId } = new ScopedAws(this);
 
+    ////////// Parameters //////////
+    const isRestrictedSSHConstructAutoRepaier = new CfnParameter(
+      this,
+      'IsRestrictedSSHConstructAutoRepaier',
+      {
+        default: 'false',
+        allowedValues: ['true', 'false'],
+      },
+    );
+
+    ////////// Rules //////////
     const restrictedSSHRule = new config.ManagedRule(
       this,
       'RestrictedSSHRule',

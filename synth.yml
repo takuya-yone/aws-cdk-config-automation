@@ -8,16 +8,14 @@ Resources:
             Effect: Allow
             Principal:
               Service: ssm.amazonaws.com
-        Version: "2012-10-17"
+        Version: '2012-10-17'
       ManagedPolicyArns:
         - Fn::Join:
-            - ""
-            - - "arn:"
+            - ''
+            - - 'arn:'
               - Ref: AWS::Partition
               - :iam::aws:policy/service-role/AmazonSSMAutomationRole
       RoleName: TestSsmAutomationRole
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/ConfigAutomationIamConstruct/testSsmAutomationRole/Resource
   RestrictedSSHConstructRestrictedSSHRuleE47565C4:
     Type: AWS::Config::ConfigRule
     Properties:
@@ -27,8 +25,6 @@ Resources:
       Source:
         Owner: AWS
         SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedSSHConstruct/RestrictedSSHRule/Resource
   RestrictedSSHConstructRestrictedSSHRuleRemediation8832934D:
     Type: AWS::Config::RemediationConfiguration
     Properties:
@@ -51,8 +47,6 @@ Resources:
             Value: RESOURCE_ID
       TargetId: AWS-CloseSecurityGroup
       TargetType: SSM_DOCUMENT
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedSSHConstruct/RestrictedSSHRuleRemediation
   RestrictedRDPConstructRestrictedRDPRuleF3896F27:
     Type: AWS::Config::ConfigRule
     Properties:
@@ -62,8 +56,6 @@ Resources:
       Source:
         Owner: AWS
         SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedRDPConstruct/RestrictedRDPRule/Resource
   RestrictedRDPConstructRestrictedRDPRuleRemediationC418DC7F:
     Type: AWS::Config::RemediationConfiguration
     Properties:
@@ -86,8 +78,6 @@ Resources:
             Value: RESOURCE_ID
       TargetId: AWS-CloseSecurityGroup
       TargetType: SSM_DOCUMENT
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedRDPConstruct/RestrictedRDPRuleRemediation
   RestrictedCommonPortsConstructRestrictedCommonPortsRule1568EFD7:
     Type: AWS::Config::ConfigRule
     Properties:
@@ -100,8 +90,6 @@ Resources:
       Source:
         Owner: AWS
         SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedCommonPortsConstruct/RestrictedCommonPortsRule/Resource
   RestrictedCommonPortsConstructRestrictedCommonPortsRuleRemediationD41A0B5C:
     Type: AWS::Config::RemediationConfiguration
     Properties:
@@ -124,8 +112,6 @@ Resources:
             Value: RESOURCE_ID
       TargetId: AWS-CloseSecurityGroup
       TargetType: SSM_DOCUMENT
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RestrictedCommonPortsConstruct/RestrictedCommonPortsRuleRemediation
   RdsSnapshotsPublicProhibitedConstructRdsSnapshotsPublicProhibitedRuleBF90DDEE:
     Type: AWS::Config::ConfigRule
     Properties:
@@ -133,8 +119,6 @@ Resources:
       Source:
         Owner: AWS
         SourceIdentifier: RDS_SNAPSHOTS_PUBLIC_PROHIBITED
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RdsSnapshotsPublicProhibitedConstruct/RdsSnapshotsPublicProhibitedRule/Resource
   RdsSnapshotsPublicProhibitedConstructRdsSnapshotsPublicProhibitedRuleRemediationF360928D:
     Type: AWS::Config::RemediationConfiguration
     Properties:
@@ -152,7 +136,7 @@ Resources:
         Private:
           StaticValue:
             Values:
-              - "Yes"
+              - 'Yes'
         AutomationAssumeRole:
           StaticValue:
             Values:
@@ -167,108 +151,10 @@ Resources:
             Values: []
       TargetId: AWSSupport-ModifyRDSSnapshotPermission
       TargetType: SSM_DOCUMENT
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/RdsSnapshotsPublicProhibitedConstruct/RdsSnapshotsPublicProhibitedRuleRemediation
-  CDKMetadata:
-    Type: AWS::CDK::Metadata
-    Properties:
-      Analytics: v2:deflate64:H4sIAAAAAAAA/0WOywrCMBBFv8V9OrYuxH3XgsQPKGMyLdM2CeShi5B/t6aKq8u9Zw7MCbq2hfaAr9AovTQrPyDfI6pFbNOQGQ1k6VYS/Wg/WYRyduQJ8hUtTqRl2mFf51+TZEgzRnZfkHwtpQhJwSWv6tkNPRqK5HfnDzZJcxWEdZpgDsdnd4HuvP06B+bGJxvZEMg93/weft3IAAAA
-    Metadata:
-      aws:cdk:path: ConfigAutomationStack/CDKMetadata/Default
-    Condition: CDKMetadataAvailable
 Parameters:
-  enableAutomaticRepaier:
+  EnableAutomaticRepaier:
     Type: String
-    Default: "false"
+    Default: 'false'
     AllowedValues:
-      - "true"
-      - "false"
-  BootstrapVersion:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: /cdk-bootstrap/hnb659fds/version
-    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
-Conditions:
-  CDKMetadataAvailable:
-    Fn::Or:
-      - Fn::Or:
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - af-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-northeast-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-northeast-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-southeast-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ap-southeast-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - ca-central-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - cn-north-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - cn-northwest-1
-      - Fn::Or:
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-central-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-north-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-2
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - eu-west-3
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - me-south-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - sa-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-east-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-east-2
-      - Fn::Or:
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-west-1
-          - Fn::Equals:
-              - Ref: AWS::Region
-              - us-west-2
-Rules:
-  CheckBootstrapVersion:
-    Assertions:
-      - Assert:
-          Fn::Not:
-            - Fn::Contains:
-                - - "1"
-                  - "2"
-                  - "3"
-                  - "4"
-                  - "5"
-                - Ref: BootstrapVersion
-        AssertDescription: CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.
+      - 'true'
+      - 'false'

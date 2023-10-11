@@ -3,6 +3,7 @@ import { Construct } from 'constructs';
 import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
+import { CfnParameter } from 'aws-cdk-lib';
 
 export interface RdsSnapshotsPublicProhibitedProps extends cdk.StackProps {
   ssmAutomationRole: iam.Role;
@@ -17,7 +18,18 @@ export class RdsSnapshotsPublicProhibitedConstruct extends Construct {
     super(scope, id);
 
     const { accountId } = new ScopedAws(this);
+    ////////// Parameters //////////
 
+    const isRdsSnapshotsPublicProhibitedConstructAutoRepaier = new CfnParameter(
+      this,
+      'IsRdsSnapshotsPublicProhibitedConstructAutoRepaier',
+      {
+        default: 'false',
+        allowedValues: ['True', 'false'],
+      },
+    );
+
+    ////////// Rules //////////
     const rdsSnapshotsPublicProhibitedRule = new config.ManagedRule(
       this,
       'RdsSnapshotsPublicProhibitedRule',
