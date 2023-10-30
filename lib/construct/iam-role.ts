@@ -10,11 +10,50 @@ export class ConfigAutomationIamConstruct extends Construct {
 
     const { accountId } = new ScopedAws(this);
 
-    const s3AccessPolicy = new iam.PolicyDocument({
+    const RestrictedCommonPortsPolicy = new iam.PolicyDocument({
       statements: [
         new iam.PolicyStatement({
-          actions: ['s3:*'],
+          actions: [
+            'ec2:RevokeSecurityGroupIngress',
+            'ec2:RevokeSecurityGroupEgress',
+            'ec2:DescribeSecurityGroups',
+          ],
+          resources: ['arn:aws:ec2:*:*:security-group/*'],
+        }),
+      ],
+    });
+
+    const EnableEbsEncryptionByDefaultPolicy = new iam.PolicyDocument({
+      statements: [
+        new iam.PolicyStatement({
+          actions: [
+            'ec2:EnableEbsEncryptionByDefault',
+            'ec2:GetEbsEncryptionByDefault',
+          ],
           resources: ['*'],
+        }),
+      ],
+    });
+
+    const RdsSnapshotsPublicProhibitedPolicy = new iam.PolicyDocument({
+      statements: [
+        new iam.PolicyStatement({
+          actions: ['rds:ModifyDBSnapshotAttribute', 'rds:DescribeDBSnapshots'],
+          resources: ['arn:aws:rds:*:*:db:*', 'arn:aws:rds:*:*:snapshot:*'],
+        }),
+      ],
+    });
+
+    const DisablePublicAccessToRDSInstancePolicy = new iam.PolicyDocument({
+      statements: [
+        new iam.PolicyStatement({
+          actions: ['rds:DescribeDBInstances', 'rds:ModifyDBInstance'],
+          resources: [
+            'arn:aws:rds:*:*:db:*',
+            'arn:aws:rds:*:*:og:*',
+            'arn:aws:rds:*:*:pg:*',
+            'arn:aws:rds:*:*:secgrp:*',
+          ],
         }),
       ],
     });
@@ -28,7 +67,10 @@ export class ConfigAutomationIamConstruct extends Construct {
         ),
       ],
       inlinePolicies: {
-        // s3AccessPolicy,
+        RestrictedCommonPortsPolicy,
+        EnableEbsEncryptionByDefaultPolicy,
+        RdsSnapshotsPublicProhibitedPolicy,
+        DisablePublicAccessToRDSInstancePolicy,
       },
     });
   }

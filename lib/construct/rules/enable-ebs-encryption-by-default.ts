@@ -6,24 +6,25 @@ import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
 
-export interface RestrictedCommonPortsConstructProps extends cdk.StackProps {
+export interface EnableEbsEncryptionByDefaultConstructProps
+  extends cdk.StackProps {
   ssmAutomationRole: iam.Role;
 }
 
-export class RestrictedCommonPortsConstruct extends Construct {
+export class EnableEbsEncryptionByDefaultConstruct extends Construct {
   constructor(
     scope: Construct,
     id: string,
-    props: RestrictedCommonPortsConstructProps,
+    props: EnableEbsEncryptionByDefaultConstructProps,
   ) {
     super(scope, id);
 
     const { accountId } = new ScopedAws(this);
 
     ////////// Parameters //////////
-    const isRestrictedCommonPortsConstructAutoRepaier = new CfnParameter(
+    const isEnableEbsEncryptionByDefaultConstructAutoRepaier = new CfnParameter(
       this,
-      'IsRestrictedCommonPortsConstructAutoRepaier',
+      'IsEnableEbsEncryptionByDefaultConstructAutoRepaier',
       {
         default: 'false',
         allowedValues: ['true', 'false'],
@@ -32,29 +33,23 @@ export class RestrictedCommonPortsConstruct extends Construct {
 
     ////////// Rules //////////
 
-    const restrictedCommonPortsRule = new config.ManagedRule(
+    const enableEbsEncryptionByDefaultRule = new config.ManagedRule(
       this,
-      'RestrictedCommonPortsRule',
+      'EnableEbsEncryptionByDefaultRule',
       {
-        configRuleName: 'RestrictedCommonPortsRule',
-        identifier:
-          config.ManagedRuleIdentifiers
-            .EC2_SECURITY_GROUPS_RESTRICTED_INCOMING_TRAFFIC,
-        inputParameters: {
-          blockedPort1: 22,
-          blockedPort2: 3389,
-        },
+        configRuleName: 'EnableEbsEncryptionByDefaultRule',
+        identifier: config.ManagedRuleIdentifiers.EC2_EBS_ENCRYPTION_BY_DEFAULT,
       },
     );
 
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_config.CfnRemediationConfiguration.html
-    const restrictedCommonPortsRuleRemediation =
+    const enableEbsEncryptionByDefaultRuleRemediation =
       new config.CfnRemediationConfiguration(
         this,
-        'RestrictedCommonPortsRuleRemediation',
+        'EnableEbsEncryptionByDefaultRuleRemediation',
         {
-          configRuleName: restrictedCommonPortsRule.configRuleName,
-          targetId: 'AWS-CloseSecurityGroup',
+          configRuleName: enableEbsEncryptionByDefaultRule.configRuleName,
+          targetId: 'AWSConfigRemediation-EnableEbsEncryptionByDefault',
           targetType: 'SSM_DOCUMENT',
           // targetVersion: '1',
 
@@ -70,11 +65,6 @@ export class RestrictedCommonPortsConstruct extends Construct {
             AutomationAssumeRole: {
               StaticValue: {
                 Values: [props.ssmAutomationRole.roleArn],
-              },
-            },
-            SecurityGroupId: {
-              ResourceValue: {
-                Value: 'RESOURCE_ID',
               },
             },
           },
