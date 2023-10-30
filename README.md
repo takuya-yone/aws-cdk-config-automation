@@ -1,14 +1,38 @@
-# Welcome to your CDK TypeScript project
+# How to Create CFn Template
 
-This is a blank project for CDK development with TypeScript.
+## CDK Synth
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+```
+npm run cdk synth > synth.yml
+```
 
-## Useful commands
+```
+yarn cdk synth > synth.yml
+```
 
-* `npm run build`   compile typescript to js
-* `npm run watch`   watch for changes and compile
-* `npm run test`    perform the jest unit tests
-* `cdk deploy`      deploy this stack to your default AWS account/region
-* `cdk diff`        compare deployed stack with current state
-* `cdk synth`       emits the synthesized CloudFormation template
+##
+
+Delete
+
+```
+~~~
+yarn run v1.22.19
+$ cdk synth
+
+~~~~
+Conditions:
+  CDKMetadataAvailable:
+  ~~~~
+~~~~
+Done in 2.92s.
+
+```
+
+Refer Parameter
+
+```
+Properties:
+    Automatic: <Parameter>
+```
+
+Delete Metadata

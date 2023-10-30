@@ -15,85 +15,65 @@ Resources:
             - - 'arn:'
               - Ref: AWS::Partition
               - :iam::aws:policy/service-role/AmazonSSMAutomationRole
+      Policies:
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - ec2:DescribeSecurityGroups
+                  - ec2:RevokeSecurityGroupEgress
+                  - ec2:RevokeSecurityGroupIngress
+                Effect: Allow
+                Resource: arn:aws:ec2:*:*:security-group/*
+            Version: '2012-10-17'
+          PolicyName: RestrictedCommonPortsPolicy
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - ec2:EnableEbsEncryptionByDefault
+                  - ec2:GetEbsEncryptionByDefault
+                Effect: Allow
+                Resource: '*'
+            Version: '2012-10-17'
+          PolicyName: EnableEbsEncryptionByDefaultPolicy
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - rds:DescribeDBSnapshots
+                  - rds:ModifyDBSnapshotAttribute
+                Effect: Allow
+                Resource:
+                  - arn:aws:rds:*:*:db:*
+                  - arn:aws:rds:*:*:snapshot:*
+            Version: '2012-10-17'
+          PolicyName: RdsSnapshotsPublicProhibitedPolicy
+        - PolicyDocument:
+            Statement:
+              - Action:
+                  - rds:DescribeDBInstances
+                  - rds:ModifyDBInstance
+                Effect: Allow
+                Resource:
+                  - arn:aws:rds:*:*:db:*
+                  - arn:aws:rds:*:*:og:*
+                  - arn:aws:rds:*:*:pg:*
+                  - arn:aws:rds:*:*:secgrp:*
+            Version: '2012-10-17'
+          PolicyName: DisablePublicAccessToRDSInstancePolicy
       RoleName: TestSsmAutomationRole
-  RestrictedSSHConstructRestrictedSSHRuleE47565C4:
-    Type: AWS::Config::ConfigRule
-    Properties:
-      ConfigRuleName: RestrictedSSHRule
-      InputParameters:
-        blockedPort1: 22
-      Source:
-        Owner: AWS
-        SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
-  RestrictedSSHConstructRestrictedSSHRuleRemediation8832934D:
-    Type: AWS::Config::RemediationConfiguration
-    Properties:
-      Automatic: false
-      ConfigRuleName:
-        Ref: RestrictedSSHConstructRestrictedSSHRuleE47565C4
-      ExecutionControls:
-        SsmControls:
-          ConcurrentExecutionRatePercentage: 2
-          ErrorPercentage: 5
-      Parameters:
-        AutomationAssumeRole:
-          StaticValue:
-            Values:
-              - Fn::GetAtt:
-                  - ConfigAutomationIamConstructtestSsmAutomationRole6553CA7A
-                  - Arn
-        SecurityGroupId:
-          ResourceValue:
-            Value: RESOURCE_ID
-      TargetId: AWS-CloseSecurityGroup
-      TargetType: SSM_DOCUMENT
-  RestrictedRDPConstructRestrictedRDPRuleF3896F27:
-    Type: AWS::Config::ConfigRule
-    Properties:
-      ConfigRuleName: RestrictedRDPRule
-      InputParameters:
-        blockedPort1: 3389
-      Source:
-        Owner: AWS
-        SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
-  RestrictedRDPConstructRestrictedRDPRuleRemediationC418DC7F:
-    Type: AWS::Config::RemediationConfiguration
-    Properties:
-      Automatic: false
-      ConfigRuleName:
-        Ref: RestrictedRDPConstructRestrictedRDPRuleF3896F27
-      ExecutionControls:
-        SsmControls:
-          ConcurrentExecutionRatePercentage: 2
-          ErrorPercentage: 5
-      Parameters:
-        AutomationAssumeRole:
-          StaticValue:
-            Values:
-              - Fn::GetAtt:
-                  - ConfigAutomationIamConstructtestSsmAutomationRole6553CA7A
-                  - Arn
-        SecurityGroupId:
-          ResourceValue:
-            Value: RESOURCE_ID
-      TargetId: AWS-CloseSecurityGroup
-      TargetType: SSM_DOCUMENT
   RestrictedCommonPortsConstructRestrictedCommonPortsRule1568EFD7:
     Type: AWS::Config::ConfigRule
     Properties:
       ConfigRuleName: RestrictedCommonPortsRule
       InputParameters:
-        blockedPort1: 20
-        blockedPort2: 21
-        blockedPort3: 3306
-        blockedPort4: 4333
+        blockedPort1: 22
+        blockedPort2: 3389
       Source:
         Owner: AWS
         SourceIdentifier: RESTRICTED_INCOMING_TRAFFIC
   RestrictedCommonPortsConstructRestrictedCommonPortsRuleRemediationD41A0B5C:
     Type: AWS::Config::RemediationConfiguration
     Properties:
-      Automatic: false
+      Automatic: !Ref RestrictedCommonPortsConstructIsRestrictedCommonPortsConstructAutoRepaier703AC3A5
       ConfigRuleName:
         Ref: RestrictedCommonPortsConstructRestrictedCommonPortsRule1568EFD7
       ExecutionControls:
@@ -112,6 +92,32 @@ Resources:
             Value: RESOURCE_ID
       TargetId: AWS-CloseSecurityGroup
       TargetType: SSM_DOCUMENT
+  EnableEbsEncryptionByDefaultConstructEnableEbsEncryptionByDefaultRuleB5B20645:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: EnableEbsEncryptionByDefaultRule
+      Source:
+        Owner: AWS
+        SourceIdentifier: EC2_EBS_ENCRYPTION_BY_DEFAULT
+  EnableEbsEncryptionByDefaultConstructEnableEbsEncryptionByDefaultRuleRemediation6D07CB01:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      Automatic: !Ref EnableEbsEncryptionByDefaultConstructIsEnableEbsEncryptionByDefaultConstructAutoRepaier61F57A31
+      ConfigRuleName:
+        Ref: EnableEbsEncryptionByDefaultConstructEnableEbsEncryptionByDefaultRuleB5B20645
+      ExecutionControls:
+        SsmControls:
+          ConcurrentExecutionRatePercentage: 2
+          ErrorPercentage: 5
+      Parameters:
+        AutomationAssumeRole:
+          StaticValue:
+            Values:
+              - Fn::GetAtt:
+                  - ConfigAutomationIamConstructtestSsmAutomationRole6553CA7A
+                  - Arn
+      TargetId: AWSConfigRemediation-EnableEbsEncryptionByDefault
+      TargetType: SSM_DOCUMENT
   RdsSnapshotsPublicProhibitedConstructRdsSnapshotsPublicProhibitedRuleBF90DDEE:
     Type: AWS::Config::ConfigRule
     Properties:
@@ -122,7 +128,7 @@ Resources:
   RdsSnapshotsPublicProhibitedConstructRdsSnapshotsPublicProhibitedRuleRemediationF360928D:
     Type: AWS::Config::RemediationConfiguration
     Properties:
-      Automatic: false
+      Automatic: !Ref RdsSnapshotsPublicProhibitedConstructIsRdsSnapshotsPublicProhibitedConstructAutoRepaierC15E592D
       ConfigRuleName:
         Ref: RdsSnapshotsPublicProhibitedConstructRdsSnapshotsPublicProhibitedRuleBF90DDEE
       ExecutionControls:
@@ -151,10 +157,58 @@ Resources:
             Values: []
       TargetId: AWSSupport-ModifyRDSSnapshotPermission
       TargetType: SSM_DOCUMENT
+  DisablePublicAccessToRDSInstanceConstructDisablePublicAccessToRDSInstanceRuleF2285015:
+    Type: AWS::Config::ConfigRule
+    Properties:
+      ConfigRuleName: DisablePublicAccessToRDSInstanceRule
+      Source:
+        Owner: AWS
+        SourceIdentifier: RDS_INSTANCE_PUBLIC_ACCESS_CHECK
+  DisablePublicAccessToRDSInstanceConstructRdsSnapshotsPublicProhibitedRuleRemediationEC08A0F0:
+    Type: AWS::Config::RemediationConfiguration
+    Properties:
+      Automatic: !Ref DisablePublicAccessToRDSInstanceConstructIsDisablePublicAccessToRDSInstanceConstructAutoRepaier56C67048
+      ConfigRuleName:
+        Ref: DisablePublicAccessToRDSInstanceConstructDisablePublicAccessToRDSInstanceRuleF2285015
+      ExecutionControls:
+        SsmControls:
+          ConcurrentExecutionRatePercentage: 2
+          ErrorPercentage: 5
+      Parameters:
+        DbiResourceId:
+          ResourceValue:
+            Value: RESOURCE_ID
+        AutomationAssumeRole:
+          StaticValue:
+            Values:
+              - Fn::GetAtt:
+                  - ConfigAutomationIamConstructtestSsmAutomationRole6553CA7A
+                  - Arn
+      TargetId: AWSConfigRemediation-DisablePublicAccessToRDSInstance
+      TargetType: SSM_DOCUMENT
+
 Parameters:
-  EnableAutomaticRepaier:
+  RestrictedCommonPortsConstructIsRestrictedCommonPortsConstructAutoRepaier703AC3A5:
     Type: String
     Default: 'false'
     AllowedValues:
       - 'true'
+      - 'false'
+  EnableEbsEncryptionByDefaultConstructIsEnableEbsEncryptionByDefaultConstructAutoRepaier61F57A31:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'true'
+      - 'false'
+  RdsSnapshotsPublicProhibitedConstructIsRdsSnapshotsPublicProhibitedConstructAutoRepaierC15E592D:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'True'
+      - 'false'
+  DisablePublicAccessToRDSInstanceConstructIsDisablePublicAccessToRDSInstanceConstructAutoRepaier56C67048:
+    Type: String
+    Default: 'false'
+    AllowedValues:
+      - 'True'
       - 'false'
