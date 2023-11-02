@@ -26,7 +26,7 @@ export class DisablePublicAccessToRDSInstanceConstruct extends Construct {
         'IsDisablePublicAccessToRDSInstanceConstructAutoRepaier',
         {
           default: 'false',
-          allowedValues: ['True', 'false'],
+          allowedValues: ['true', 'false'],
         },
       );
 

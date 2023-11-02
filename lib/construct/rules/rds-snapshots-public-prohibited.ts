@@ -25,7 +25,7 @@ export class RdsSnapshotsPublicProhibitedConstruct extends Construct {
       'IsRdsSnapshotsPublicProhibitedConstructAutoRepaier',
       {
         default: 'false',
-        allowedValues: ['True', 'false'],
+        allowedValues: ['true', 'false'],
       },
     );
 

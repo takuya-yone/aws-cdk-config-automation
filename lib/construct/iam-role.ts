@@ -16,9 +16,12 @@ export class ConfigAutomationIamConstruct extends Construct {
           actions: [
             'ec2:RevokeSecurityGroupIngress',
             'ec2:RevokeSecurityGroupEgress',
-            'ec2:DescribeSecurityGroups',
           ],
           resources: ['arn:aws:ec2:*:*:security-group/*'],
+        }),
+        new iam.PolicyStatement({
+          actions: ['ec2:DescribeSecurityGroups'],
+          resources: ['*'],
         }),
       ],
     });
