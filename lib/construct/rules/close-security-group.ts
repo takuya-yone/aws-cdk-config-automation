@@ -6,24 +6,20 @@ import { ScopedAws } from 'aws-cdk-lib';
 import { aws_config as config } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
 
-export interface RestrictedCommonPortsConstructProps extends cdk.StackProps {
+export interface CloseSecurityGroupProps extends cdk.StackProps {
   ssmAutomationRole: iam.Role;
 }
 
-export class RestrictedCommonPortsConstruct extends Construct {
-  constructor(
-    scope: Construct,
-    id: string,
-    props: RestrictedCommonPortsConstructProps,
-  ) {
+export class CloseSecurityGroup extends Construct {
+  constructor(scope: Construct, id: string, props: CloseSecurityGroupProps) {
     super(scope, id);
 
     const { accountId } = new ScopedAws(this);
 
     ////////// Parameters //////////
-    const isRestrictedCommonPortsConstructAutoRepaier = new CfnParameter(
+    const isCloseSecurityGroupAutoRepaier = new CfnParameter(
       this,
-      'IsRestrictedCommonPortsConstructAutoRepaier',
+      'IsCloseSecurityGroupAutoRepaier',
       {
         default: 'false',
         allowedValues: ['true', 'false'],
@@ -32,11 +28,11 @@ export class RestrictedCommonPortsConstruct extends Construct {
 
     ////////// Rules //////////
 
-    const restrictedCommonPortsRule = new config.ManagedRule(
+    const closeSecurityGroupRule = new config.ManagedRule(
       this,
-      'RestrictedCommonPortsRule',
+      'CloseSecurityGroupRule',
       {
-        configRuleName: 'RestrictedCommonPortsRule',
+        configRuleName: 'CloseSecurityGroupRule',
         identifier:
           config.ManagedRuleIdentifiers
             .EC2_SECURITY_GROUPS_RESTRICTED_INCOMING_TRAFFIC,
@@ -48,12 +44,12 @@ export class RestrictedCommonPortsConstruct extends Construct {
     );
 
     // https://docs.aws.amazon.com/cdk/api/v2/docs/aws-cdk-lib.aws_config.CfnRemediationConfiguration.html
-    const restrictedCommonPortsRuleRemediation =
+    const closeSecurityGroupRuleRemediation =
       new config.CfnRemediationConfiguration(
         this,
-        'RestrictedCommonPortsRuleRemediation',
+        'CloseSecurityGroupRuleRemediation',
         {
-          configRuleName: restrictedCommonPortsRule.configRuleName,
+          configRuleName: closeSecurityGroupRule.configRuleName,
           targetId: 'AWS-CloseSecurityGroup',
           targetType: 'SSM_DOCUMENT',
           // targetVersion: '1',

@@ -61,6 +61,22 @@ export class ConfigAutomationIamConstruct extends Construct {
       ],
     });
 
+    const CreateEncryptedRdsSnapshotPolicy = new iam.PolicyDocument({
+      statements: [
+        new iam.PolicyStatement({
+          actions: [
+            'rds:DescribeDBSnapshots',
+            'rds:AddTagsToResource',
+            'rds:ListTagsForResource',
+            'rds:CreateDBSnapshot',
+            'rds:CopyDBSnapshot',
+            'rds:DeleteDBSnapsho',
+          ],
+          resources: ['arn:aws:rds:*:*:*'],
+        }),
+      ],
+    });
+
     this.ssmAutomationRole = new iam.Role(this, 'testSsmAutomationRole', {
       roleName: 'TestSsmAutomationRole',
       assumedBy: new iam.ServicePrincipal('ssm.amazonaws.com'),
@@ -74,6 +90,7 @@ export class ConfigAutomationIamConstruct extends Construct {
         EnableEbsEncryptionByDefaultPolicy,
         RdsSnapshotsPublicProhibitedPolicy,
         DisablePublicAccessToRDSInstancePolicy,
+        CreateEncryptedRdsSnapshotPolicy,
       },
     });
   }

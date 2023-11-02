@@ -3,10 +3,11 @@ import { Construct } from 'constructs';
 import { CfnParameter } from 'aws-cdk-lib';
 
 import { ConfigAutomationIamConstruct } from '../construct/iam-role';
-import { RestrictedCommonPortsConstruct } from '../construct/rules/restricted-common-ports';
+import { CloseSecurityGroup } from '../construct/rules/close-security-group';
 import { RdsSnapshotsPublicProhibitedConstruct } from '../construct/rules/rds-snapshots-public-prohibited';
 import { DisablePublicAccessToRDSInstanceConstruct } from '../construct/rules/disable-public-access-to-rds-instance';
 import { EnableEbsEncryptionByDefaultConstruct } from '../construct/rules/enable-ebs-encryption-by-default';
+import { CreateEncryptedRdsSnapshotConstruct } from '../construct/rules/create-encrypted-rds-snapshot';
 
 export class ConfigAutomationStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
@@ -29,7 +30,7 @@ export class ConfigAutomationStack extends cdk.Stack {
 
     ////////// Rules //////////
 
-    const restrictedCommonPortsConstruct = new RestrictedCommonPortsConstruct(
+    const restrictedCommonPortsConstruct = new CloseSecurityGroup(
       this,
       'RestrictedCommonPortsConstruct',
       {
@@ -61,6 +62,15 @@ export class ConfigAutomationStack extends cdk.Stack {
       new DisablePublicAccessToRDSInstanceConstruct(
         this,
         'DisablePublicAccessToRDSInstanceConstruct',
+        {
+          ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
+        },
+      );
+
+    const createEncryptedRdsSnapshotConstruct =
+      new CreateEncryptedRdsSnapshotConstruct(
+        this,
+        'CreateEncryptedRdsSnapshotConstruct',
         {
           ssmAutomationRole: configAutomationIamConstruct.ssmAutomationRole,
         },
